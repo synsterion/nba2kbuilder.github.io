@@ -2061,7 +2061,14 @@
       return isReversed ? -res : res;
     });
 
-    filtered.forEach(card => {
+    // 1. Set a limit to prevent rendering thousands of HTML boxes at once
+    const DISPLAY_LIMIT = 100;
+    const cardsToDisplay = filtered.slice(0, DISPLAY_LIMIT);
+    
+    // 2. Build ONE giant HTML string in the background
+    let finalHtml = '';
+
+    cardsToDisplay.forEach(card => {
       let leftColHtml = '';
       let rightColHtml = '';
 
@@ -2077,14 +2084,14 @@
         else rightColHtml += rowHtml;
       });
 
-      container.innerHTML += `
+      finalHtml += `
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">${card.player}</h3>
             <div class="card-subtitle">
               <strong>${card.position}</strong> | 
-              <span class="${card.tier === 'Lunar Rose' ? 'highlight' : ''}">${card.tier}</span> | 
-              <span class="${card.theme === 'Playoffs' ? 'highlight' : ''}">${card.theme}</span> | 
+              <span>${card.tier}</span> | 
+              <span>${card.theme}</span> | 
               ${card.team}
             </div>
           </div>
@@ -2095,6 +2102,18 @@
         </div>
       `;
     });
+
+    // 3. If there are more cards than the limit, add a helpful message at the bottom
+    if (filtered.length > DISPLAY_LIMIT) {
+      finalHtml += `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--accent); background: var(--card-bg); border-radius: 8px;">
+          Showing top ${DISPLAY_LIMIT} of ${filtered.length} results. Use the search or filters to narrow down your roster!
+        </div>
+      `;
+    }
+
+    // 4. Update the website DOM exactly ONE time. This eliminates the lag!
+    container.innerHTML = finalHtml;
   }
 
   /* =========================================================

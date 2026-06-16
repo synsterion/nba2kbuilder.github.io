@@ -275,7 +275,19 @@
     </div>
 
     <div class="controls" style="background: #2a2a2a; border: 1px dashed var(--accent);">
-      <div style="width: 100%; font-weight: bold; margin-bottom: 5px; color: var(--accent);">Target 5 Stats (Shoe + Auto-Mentor):</div>
+      
+      <!-- Fandom Toggles (Favorite Team is hidden by default) -->
+      <div style="width: 100%; display: flex; gap: 15px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border);">
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: bold; cursor: pointer;">
+          <input type="checkbox" id="build-fandom-toggle" onchange="document.getElementById('fav-team-container').style.display = this.checked ? 'flex' : 'none'; if(!this.checked) document.getElementById('build-favorite-toggle').checked = false;"> Include Fandom?
+        </label>
+        
+        <label id="fav-team-container" style="display: none; align-items: center; gap: 8px; font-size: 14px; font-weight: bold; cursor: pointer;">
+          <input type="checkbox" id="build-favorite-toggle"> Favorite Team?
+        </label>
+      </div>
+
+      <div style="width: 100%; font-weight: bold; margin-bottom: 5px; color: var(--accent);">Target 5 Stats (Shoe + Auto-Mentor + Fandom):</div>
       <select id="build-stat-1"></select>
       <select id="build-stat-2"></select>
       <select id="build-stat-3"></select>
@@ -315,7 +327,6 @@
   let isReversed = false;
 
   const CARDS = [
-    { player: "Michael Redd", position: "SG", theme: "Foundation", tier: "Titanium Quartz", team: "Bucks", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 5, "Strength": 3, "Rebounding": 2, "Playmaking": 4, "Defending": 4 } },
     { player: "Derrick Jones Jr.", position: "SF", theme: "Foundation", tier: "Titanium Quartz", team: "Clippers", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 5, "Mid-range Shooting": 3, "3PT Shot": 4, "Post Scoring": 2, "Agility": 5, "Strength": 4, "Rebounding": 4, "Playmaking": 3, "Defending": 4 } },
     { player: "Dejounte Murray", position: "PG", theme: "Throwback", tier: "Cobalt", team: "Spurs", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 4, "3PT Shot": 4, "Post Scoring": 2, "Agility": 5, "Strength": 2, "Rebounding": 4, "Playmaking": 4, "Defending": 5 } },
     { player: "George Gervin", position: "SF", theme: "50-Piece Club", tier: "Solar Diamond", team: "Spurs", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 4, "Agility": 5, "Strength": 2, "Rebounding": 2, "Playmaking": 4, "Defending": 4 } },
@@ -323,9 +334,6 @@
     { player: "Kawhi Leonard", position: "SF", theme: "Playoffs 2025", tier: "Solar Diamond", team: "Clippers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 5, "Strength": 4, "Rebounding": 4, "Playmaking": 4, "Defending": 5 } },
     { player: "Klay Thompson", position: "SG", theme: "Flamethrowers", tier: "Agate", team: "Mavericks", stats: { "Shoot off Dribble": 6, "Layups & Dunks": 3, "Mid-range Shooting": 6, "3PT Shot": 6, "Post Scoring": 3, "Agility": 4, "Strength": 3, "Rebounding": 2, "Playmaking": 4, "Defending": 4 } },
     { player: "Paul George", position: "SG", theme: "Most Improved", tier: "Ruby", team: "Pacers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 4, "3PT Shot": 5, "Post Scoring": 3, "Agility": 4, "Strength": 4, "Rebounding": 3, "Playmaking": 4, "Defending": 5 } },
-    { player: "Tracy McGrady", position: "SG", theme: "S7 St. Patrick's", tier: "Solar Diamond", team: "Magic", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 5, "Strength": 4, "Rebounding": 4, "Playmaking": 4, "Defending": 4 } },
-    { player: "Anthony Edwards", position: "SG", theme: "Foundation", tier: "Nexus Crystal", team: "Timberwolves", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 5, "Strength": 4, "Rebounding": 3, "Playmaking": 4, "Defending": 5 } },
-    { player: "Monta Ellis", position: "SG", theme: "Foundation", tier: "Purple Sapphire", team: "Warriors", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 3, "Agility": 5, "Strength": 3, "Rebounding": 2, "Playmaking": 5, "Defending": 4 } },
     { player: "Pete Maravich", position: "SG", theme: "Best of the West", tier: "Arcane Crystal", team: "Jazz", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 3, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 3, "Agility": 4, "Strength": 2, "Rebounding": 2, "Playmaking": 5, "Defending": 4 } },
 { player: "Kevin Garnett", position: "C", theme: "Best of the West", tier: "Arcane Crystal", team: "Timberwolves", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 2, "Post Scoring": 5, "Agility": 4, "Strength": 5, "Rebounding": 5, "Playmaking": 4, "Defending": 5 } },
 { player: "Shaquille O'Neal", position: "C", theme: "Best of the West", tier: "Arcane Crystal", team: "Lakers", stats: { "Shoot off Dribble": 2, "Layups & Dunks": 5, "Mid-range Shooting": 1, "3PT Shot": 1, "Post Scoring": 5, "Agility": 4, "Strength": 5, "Rebounding": 5, "Playmaking": 3, "Defending": 5 } },
@@ -613,6 +621,30 @@
 { player: "Kendrick Perkins", position: "C", theme: "Foundation", tier: "Antimatter", team: "Celtics", stats: { "Shoot off Dribble": 2, "Layups & Dunks": 4, "Mid-range Shooting": 2, "3PT Shot": 1, "Post Scoring": 4, "Agility": 2, "Strength": 5, "Rebounding": 5, "Playmaking": 2, "Defending": 4 } },																	
 { player: "Keith Van Horn", position: "SF", theme: "Foundation", tier: "Antimatter", team: "Nets", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 4, "Strength": 2, "Rebounding": 5, "Playmaking": 2, "Defending": 4 } },																	
 { player: "Raymond Felton", position: "PG", theme: "Foundation", tier: "Antimatter", team: "Hornets", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 3, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 2, "Agility": 5, "Strength": 3, "Rebounding": 2, "Playmaking": 5, "Defending": 4 } },																	
+{ player: "Luka Doncic", position: "PG", theme: "Rookies of the Year", tier: "Lunar Rose", team: "Timberwolves", stats: { "Shoot off Dribble": 6, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 5, "Agility": 5, "Strength": 4, "Rebounding": 5, "Playmaking": 6, "Defending": 4 } },																	
+{ player: "Allen Iverson", position: "SG", theme: "Rookies of the Year", tier: "Lunar Rose", team: "Sixers", stats: { "Shoot off Dribble": 6, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 2, "Agility": 6, "Strength": 4, "Rebounding": 2, "Playmaking": 6, "Defending": 5 } },																	
+{ player: "Willis Reed", position: "PF", theme: "Rookies of the Year", tier: "Lunar Rose", team: "Knicks", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 2, "Post Scoring": 5, "Agility": 6, "Strength": 5, "Rebounding": 5, "Playmaking": 5, "Defending": 5 } },																	
+{ player: "Vince Carter", position: "SF", theme: "Rookies of the Year", tier: "Lunar Rose", team: "Raptors", stats: { "Shoot off Dribble": 6, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 3, "Agility": 6, "Strength": 3, "Rebounding": 3, "Playmaking": 5, "Defending": 4 } },																	
+{ player: "Derrick Rose", position: "PG", theme: "Rookies of the Year", tier: "Lunar Rose", team: "Bulls", stats: { "Shoot off Dribble": 6, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 3, "Agility": 6, "Strength": 3, "Rebounding": 2, "Playmaking": 6, "Defending": 4 } },																	
+{ player: "Damian Lillard", position: "PG", theme: "Rookies of the Year", tier: "Lunar Rose", team: "Trailblazers", stats: { "Shoot off Dribble": 6, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 1, "Agility": 6, "Strength": 3, "Rebounding": 3, "Playmaking": 6, "Defending": 3 } },																	
+{ player: "Patrick Ewing", position: "C", theme: "Rookies of the Year", tier: "Lunar Rose", team: "Knicks", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 2, "Post Scoring": 5, "Agility": 4, "Strength": 5, "Rebounding": 5, "Playmaking": 4, "Defending": 5 } },																	
+{ player: "Chris Webber", position: "C", theme: "Rookies of the Year", tier: "Lunar Rose", team: "Warriors", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 2, "Post Scoring": 5, "Agility": 6, "Strength": 5, "Rebounding": 5, "Playmaking": 5, "Defending": 4 } },																	
+{ player: "Cooper Flagg", position: "SF", theme: "Rookies of the Year", tier: "Lunar Rose", team: "Timberwolves", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 4, "3PT Shot": 4, "Post Scoring": 4, "Agility": 6, "Strength": 4, "Rebounding": 3, "Playmaking": 6, "Defending": 5 } },																	
+{ player: "Victor Wembanyama", position: "C", theme: "Rookies of the Year", tier: "Aqua Diamond", team: "Spurs", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 4, "Post Scoring": 5, "Agility": 5, "Strength": 3, "Rebounding": 5, "Playmaking": 4, "Defending": 5 } },																	
+{ player: "Kyrie Irving", position: "SG", theme: "Rookies of the Year", tier: "Aqua Diamond", team: "Cavaliers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 3, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 3, "Agility": 6, "Strength": 1, "Rebounding": 3, "Playmaking": 6, "Defending": 4 } },																	
+{ player: "Pau Gasol", position: "PF", theme: "Rookies of the Year", tier: "Aqua Diamond", team: "Grizzlies", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 5, "Agility": 4, "Strength": 5, "Rebounding": 5, "Playmaking": 5, "Defending": 4 } },																	
+{ player: "Larry Johnson", position: "SF", theme: "Rookies of the Year", tier: "Aqua Diamond", team: "Hornets", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 4, "Agility": 6, "Strength": 5, "Rebounding": 4, "Playmaking": 5, "Defending": 4 } },																	
+{ player: "Lamelo Ball", position: "PG", theme: "Rookies of the Year", tier: "Aqua Diamond", team: "Hornets", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 3, "Agility": 6, "Strength": 3, "Rebounding": 4, "Playmaking": 6, "Defending": 4 } },																	
+{ player: "Jason Kidd", position: "PG", theme: "Rookies of the Year", tier: "Arcana", team: "Timberwolves", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 3, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 2, "Agility": 6, "Strength": 4, "Rebounding": 3, "Playmaking": 6, "Defending": 5 } },																	
+{ player: "Karl-Anthony Towns", position: "C", theme: "Rookies of the Year", tier: "Arcana", team: "Timberwolves", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 5, "Post Scoring": 5, "Agility": 5, "Strength": 4, "Rebounding": 5, "Playmaking": 4, "Defending": 4 } },																	
+{ player: "Dave Bing", position: "SG", theme: "Rookies of the Year", tier: "Arcana", team: "Pistons", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 2, "Post Scoring": 5, "Agility": 4, "Strength": 5, "Rebounding": 5, "Playmaking": 4, "Defending": 5 } },																	
+{ player: "Elton Brand", position: "PF", theme: "Rookies of the Year", tier: "Arcana", team: "Bulls", stats: { "Shoot off Dribble": 3, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 2, "Post Scoring": 5, "Agility": 4, "Strength": 5, "Rebounding": 5, "Playmaking": 4, "Defending": 4 } },																	
+{ player: "Jai Morant", position: "SG", theme: "Rookies of the Year", tier: "Arcana", team: "Grizzlies", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 2, "Agility": 6, "Strength": 3, "Rebounding": 3, "Playmaking": 6, "Defending": 4 } },																	
+{ player: "Chris Paul", position: "PG", theme: "Rookies of the Year", tier: "Crimson", team: "Pelicans", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 2, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 3, "Agility": 5, "Strength": 3, "Rebounding": 2, "Playmaking": 6, "Defending": 4 } },																	
+{ player: "Paolo Banchero", position: "PF", theme: "Rookies of the Year", tier: "Crimson", team: "Magic", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 4, "Post Scoring": 5, "Agility": 6, "Strength": 5, "Rebounding": 4, "Playmaking": 5, "Defending": 4 } },																	
+{ player: "Steve Francis", position: "SF", theme: "Rookies of the Year", tier: "Crimson", team: "Rockets", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 3, "Agility": 6, "Strength": 3, "Rebounding": 3, "Playmaking": 6, "Defending": 4 } },																	
+{ player: "Andrew Wiggins", position: "SF", theme: "Rookies of the Year", tier: "Crimson", team: "Timberwolves", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 5, "Post Scoring": 4, "Agility": 6, "Strength": 3, "Rebounding": 2, "Playmaking": 5, "Defending": 4 } },																	
+{ player: "Tyreke Evans", position: "SG", theme: "Rookies of the Year", tier: "Crimson", team: "Kings", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 3, "Post Scoring": 3, "Agility": 6, "Strength": 4, "Rebounding": 3, "Playmaking": 6, "Defending": 4 } },
 { player: "Shaquille O'Neal", position: "PF", theme: "S8 Courtside", tier: "Lunar Rose", team: "Magic", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 1, "3PT Shot": 1, "Post Scoring": 5, "Agility": 4, "Strength": 5, "Rebounding": 5, "Playmaking": 3, "Defending": 5 } },
 { player: "Luka Doncic", position: "SF", theme: "S8 Courtside", tier: "Aqua Diamond", team: "Lakers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 6, "3PT Shot": 6, "Post Scoring": 5, "Agility": 4, "Strength": 4, "Rebounding": 5, "Playmaking": 5, "Defending": 4 } },																									
 { player: "Nikola Jokic", position: "C", theme: "S8 Courtside", tier: "Aqua Diamond", team: "Nuggets", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 6, "3PT Shot": 5, "Post Scoring": 5, "Agility": 4, "Strength": 4, "Rebounding": 5, "Playmaking": 6, "Defending": 4 } },																									
@@ -622,6 +654,9 @@
 { player: "LeBron James", position: "PF", theme: "S8 Courtside", tier: "Crimson", team: "Cavaliers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 5, "Post Scoring": 5, "Agility": 5, "Strength": 5, "Rebounding": 4, "Playmaking": 5, "Defending": 5 } },																									
 { player: "Shai Gilgeous-Alexander", position: "SG", theme: "S8 Courtside", tier: "Crimson", team: "Thunder", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 4, "Agility": 5, "Strength": 3, "Rebounding": 3, "Playmaking": 5, "Defending": 5 } },																									
 { player: "Jalen Brunson", position: "PG", theme: "Finals Moments", tier: "Lunar Rose", team: "Knicks", stats: { "Shoot off Dribble": 7, "Layups & Dunks": 3, "Mid-range Shooting": 6, "3PT Shot": 5, "Post Scoring": 3, "Agility": 5, "Strength": 5, "Rebounding": 2, "Playmaking": 5, "Defending": 4 } },																									
+{ player: "OG Anunoby", position: "SF", theme: "Finals Moments", tier: "Lunar Rose", team: "Knicks", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 6, "Mid-range Shooting": 5, "3PT Shot": 7, "Post Scoring": 2, "Agility": 7, "Strength": 4, "Rebounding": 6, "Playmaking": 2, "Defending": 5 } },																	
+{ player: "Stephon Castle", position: "SG", theme: "Finals Moments", tier: "Lunar Rose", team: "Spurs", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 6, "Mid-range Shooting": 4, "3PT Shot": 5, "Post Scoring": 2, "Agility": 5, "Strength": 4, "Rebounding": 3, "Playmaking": 4, "Defending": 7 } },																	
+{ player: "Karl-Anthony Towns", position: "PF", theme: "Finals Moments", tier: "Lunar Rose", team: "Knicks", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 6, "Post Scoring": 5, "Agility": 4, "Strength": 4, "Rebounding": 7, "Playmaking": 4, "Defending": 5 } },
 { player: "Victor Wembanyama", position: "C", theme: "Finals 2026", tier: "Lunar Rose", team: "Spurs", stats: { "Shoot off Dribble": 6, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 4, "Post Scoring": 6, "Agility": 4, "Strength": 3, "Rebounding": 5, "Playmaking": 3, "Defending": 6 } },																									
 { player: "Tim Duncan", position: "PF", theme: "Finals 2026", tier: "Lunar Rose", team: "Spurs", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 6, "Mid-range Shooting": 6, "3PT Shot": 2, "Post Scoring": 5, "Agility": 3, "Strength": 5, "Rebounding": 5, "Playmaking": 3, "Defending": 5 } },																									
 { player: "Dwayne Wade", position: "SG", theme: "Finals 2026", tier: "Lunar Rose", team: "Heat", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 6, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 4, "Agility": 5, "Strength": 4, "Rebounding": 3, "Playmaking": 5, "Defending": 5 } },																									
@@ -2049,9 +2084,131 @@
     { name: "Curry 6 All-Star", rarity: "Epic", positions: ["None"], team: "None", options: [{ amount: 2, stats: ["Shoot off Dribble"] }, { amount: 2, stats: ["Post Scoring", "Agility", "Rebounding"] }, { amount: 1, stats: ["3PT Shot"] }] },
     { name: "Curry 8", rarity: "Rare", positions: ["SF"], team: "None", options: [{ amount: 2, stats: ["Agility"] }, { amount: 1, stats: ["Playmaking", "Defending", "Mid-range Shooting"] }] },
     { name: "UA Drive 4 Low", rarity: "Rare", positions: ["None"], team: "None", options: [{ amount: 2, stats: ["Strength"] }, { amount: 1, stats: ["3PT Shot"] }] },
-    { name: "qweqweqwe", rarity: "Epic", positions: ["None"], team: "None", options: [{ amount: 2, stats: ["qweqweqweqwe"] }, { amount: 2, stats: ["qweqweqwe", "qweqweqwe", "qweqweqwe"] }, { amount: 1, stats: ["qweqweqwe"] }] },
 
   ];
+
+  const TEAM_FANDOMS = {
+    "Celtics": { 
+      main: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Spurs": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }, { amount: 1, stat: "Mid-range Shooting" }] 
+    },
+    "Nets": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "3PT Shot" }, { amount: 1, stat: "Playmaking" }], 
+      favorite: [] 
+    },
+    "Trailblazers": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "3PT Shot" }, { amount: 1, stat: "Playmaking" }], 
+      favorite: [] 
+    },
+    "Raptors": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "3PT Shot" }, { amount: 1, stat: "Playmaking" }], 
+      favorite: [] 
+    },
+    "Knicks": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }] 
+    },
+    "Sixers": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }] 
+    },
+    "Bulls": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }, { amount: 1, stat: "Mid-range Shooting" }] 
+    },
+    "Cavaliers": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }] 
+    },
+    "Pacers": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Hornets": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Pistons": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Wizards": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Jazz": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Bucks": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }] 
+    },
+    "Magic": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Kings": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Pelicans": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Nuggets": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }] 
+    },
+    "Timberwolves": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }] 
+    },
+    "Thunder": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }] 
+    },
+    "Suns": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }] 
+    },
+    "Clippers": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }], 
+      favorite: [{ amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "3PT Shot" }, { amount: 1, stat: "Playmaking" }]
+    },
+    "Lakers": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Playmaking" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Mavericks": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Playmaking" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Rockets": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }, { amount: 1, stat: "Mid-range Shooting" }] 
+    },
+    "Grizzlies": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }, { amount: 1, stat: "Mid-range Shooting" }] 
+    },
+    "Warriors": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }, { amount: 1, stat: "Playmaking" }], 
+      favorite: [{ amount: 1, stat: "3PT Shot" }] 
+    },
+    "Hawks": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }, { amount: 1, stat: "Mid-range Shooting" }] 
+    },
+    "Heat": { 
+      main: [{ amount: 1, stat: "Layups & Dunks" }, { amount: 1, stat: "Mid-range Shooting" }], 
+      favorite: [{ amount: 1, stat: "Playmaking" }, { amount: 1, stat: "3PT Shot" }, { amount: 1, stat: "Mid-range Shooting" }] 
+    },
+  };
 
   const getTierColor = (tier) => {
     const colors = {
@@ -2107,6 +2264,25 @@
     const shadowColor = shadowMatch ? shadowMatch[0] : "var(--border)";
 
     return { fill, isGradient, shadowColor };
+  };
+
+  const getRarityColor = (rarity) => {
+    const colors = {
+      "Common": "linear-gradient(135deg, #94a3b8, #808080)",      
+      "Uncommon": "linear-gradient(135deg, #22c55e, #1eff00)",    
+      "Rare": "linear-gradient(135deg, #3b82f6, #0070dd)",        
+      "Epic": "linear-gradient(135deg, #a855f7, #a335ee)",        
+      "Legendary": "linear-gradient(135deg, #eab308, #ff8000)" // Example Gradient!
+    };
+    
+    const fill = colors[rarity] || "var(--text-main)";
+    
+    // If it's a gradient, return the CSS required to clip it to the text. Otherwise, return standard color.
+    if (fill.includes("gradient")) {
+      return `background: ${fill}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;`;
+    } else {
+      return `color: ${fill};`;
+    }
   };
 
   /* =========================================================
@@ -2344,27 +2520,36 @@
      ========================================================= */
 
   function findBestMentor() {
+    // 1. Get Target Stats
     const s1 = document.getElementById('stat-1').value;
     const s2 = document.getElementById('stat-2').value;
     const container = document.getElementById('mentor-results');
 
-    let results = [];
+    // 2. Track Requested Profile for Tie-Breakers
+    let reqProfile = {};
+    [s1, s2].forEach(s => reqProfile[s] = (reqProfile[s] || 0) + 2);
+
+    // 3. Read All Filters
     const searchQ = document.getElementById('mentor-search-player').value.toLowerCase();
     const posF = document.getElementById('mentor-filter-position').value;
     const tierF = document.getElementById('mentor-filter-tier').value;
     const themeF = document.getElementById('mentor-filter-theme').value;
     const teamF = document.getElementById('mentor-filter-team').value;
     const rarF = document.getElementById('mentor-filter-rarity').value;
-    
+
     const gearSelect = document.getElementById('mentor-filter-gear');
     const selectedGears = Array.from(gearSelect.selectedOptions).map(opt => opt.value);
 
+    // 4. Read Mentor Toggles
     const includeMentor = document.getElementById('include-mentor-toggle').checked;
     const mS1 = document.getElementById('mentor-stat-1').value;
     const mS2 = document.getElementById('mentor-stat-2').value;
     const mAmount1 = parseInt(document.getElementById('mentor-amount-1').value) || 0;
     const mAmount2 = parseInt(document.getElementById('mentor-amount-2').value) || 0;
 
+    let results = [];
+
+    // 5. Run the Core Engine Loop
     CARDS.forEach(card => {
       if (searchQ !== '' && !card.player.toLowerCase().includes(searchQ)) return;
       if (posF !== 'All' && card.position !== posF) return;
@@ -2375,78 +2560,88 @@
       GEAR.forEach(baseGear => {
         if (rarF !== 'All' && baseGear.rarity !== rarF) return;
         if (!baseGear.positions.includes("None") && !baseGear.positions.includes(card.position)) return;
-        if (!selectedGears.includes("All") && !selectedGears.includes(baseGear.name)) return;
-        
-        // 🚨 NEW: Reject if gear has a specific team and the card doesn't match
         if (baseGear.team !== "None" && baseGear.team !== card.team) return;
+        if (!selectedGears.includes("All") && !selectedGears.includes(baseGear.name)) return;
 
         let gearVariations = getGearVariations(baseGear);
 
         gearVariations.forEach(gear => {
-          let mentorBoostS1 = 0;
-          if (includeMentor) {
-            if (mS1 === s1) mentorBoostS1 += mAmount1;
-            if (mS2 === s1) mentorBoostS1 += mAmount2; 
-          }
-          let cardS1 = card.stats[s1] || 0;
-          let gearS1 = (gear.boosts[s1] || 0) + mentorBoostS1;
-          const totalS1 = Math.min(7, cardS1 + gearS1);
-          const wastedS1 = Math.max(0, (cardS1 + gearS1) - 7);
+          let uniqueStats = [...new Set([s1, s2])];
+          let totalScore = 0;
+          let totalWasted = 0;
+          let baseStatsSum = 0;
 
-          let mentorBoostS2 = 0;
-          if (includeMentor) {
-            if (mS1 === s2) mentorBoostS2 += mAmount1;
-            if (mS2 === s2) mentorBoostS2 += mAmount2;
-          }
-          let cardS2 = card.stats[s2] || 0;
-          let gearS2 = (gear.boosts[s2] || 0) + mentorBoostS2;
-          const totalS2 = Math.min(7, cardS2 + gearS2);
-          const wastedS2 = Math.max(0, (cardS2 + gearS2) - 7);
+          uniqueStats.forEach(stat => {
+            let mBoost = 0;
+            if (includeMentor) {
+              if (mS1 === stat) mBoost += mAmount1;
+              if (mS2 === stat) mBoost += mAmount2;
+            }
+            let cStat = card.stats[stat] || 0;
+            let gStat = gear.boosts[stat] || 0;
+            let combined = cStat + gStat + mBoost;
+            
+            totalScore += Math.min(7, combined);
+            totalWasted += Math.max(0, combined - 7);
+            baseStatsSum += cStat;
+          });
 
-          const totalWasted = wastedS1 + wastedS2;
-          
-          // SCORE FIXED: It strictly measures the capped stats (Max 14)
-          const totalScore = totalS1 + totalS2;
+          let profileMatch = 0;
+          for (let stat in reqProfile) {
+            let mBoost = 0;
+            if (includeMentor) {
+              if (mS1 === stat) mBoost += mAmount1;
+              if (mS2 === stat) mBoost += mAmount2;
+            }
+            let gStat = gear.boosts[stat] || 0;
+            profileMatch += Math.min(reqProfile[stat], gStat + mBoost);
+          }
 
           results.push({
-            card, gear, totalS1, cardS1, gearS1, totalS2, cardS2, gearS2, totalScore,
-            includeMentor, mS1, mS2, mAmount1, mAmount2, totalWasted
+            card, gear, totalScore, includeMentor, mS1, mS2, mAmount1, mAmount2, 
+            totalWasted, baseStatsSum, profileMatch
           });
         });
       });
     });
 
-    // Helper to rank rarities so lower tiers score lower (meaning they bubble up to the top)
-    const rarityRank = { "Common": 1, "Uncommon": 2, "Rare": 3, "Epic": 4, "Legendary": 5 };
-    const getRarityWeight = (r) => rarityRank[r] || 99; // Unknowns fall to bottom
+    if (results.length === 0) {
+      container.innerHTML = `<p>No valid combinations found.</p>`;
+      return;
+    }
 
-    // Sort the results first so the absolute best builds are at the top
+    // 6. Sort by Best Fit
+    const rarityRank = { "Common": 1, "Uncommon": 2, "Rare": 3, "Epic": 4, "Legendary": 5 };
+    const getRarityWeight = (r) => rarityRank[r] || 99;
+
     results.sort((a, b) => {
       if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+      if (b.profileMatch !== a.profileMatch) return b.profileMatch - a.profileMatch; 
       if (a.totalWasted !== b.totalWasted) return a.totalWasted - b.totalWasted;
       
-      // 🚨 NEW: If scores and waste are tied, prioritize the lesser rarity gear!
       const rarityA = getRarityWeight(a.gear.rarity);
       const rarityB = getRarityWeight(b.gear.rarity);
       if (rarityA !== rarityB) return rarityA - rarityB; 
       
-      return (b.cardS1 + b.cardS2) - (a.cardS1 + a.cardS2);
+      return b.baseStatsSum - a.baseStatsSum;
     });
 
+    // 7. Generate UI
+    let uniqueStatsCount = [...new Set([s1, s2])].length;
+    let maxPips = uniqueStatsCount * 7;
+
     let html = `<h3>Optimal Mentor Builds for ${s1} & ${s2}</h3>`;
-    html += `<p style="color:var(--text-muted)">Max score achievable out of 14 pips.</p>`;
+    html += `<p style="color:var(--text-muted)">Max score achievable out of ${maxPips} pips.</p>`;
 
     let optimalGears = new Set();
     
-    // Collect all gears that achieved exactly 14/14
     results.forEach(res => {
-      if (res.totalScore === 14) {
-        // 🚨 NEW: Include the rarity inside the summary label
-        optimalGears.add(`${res.gear.name} [${res.gear.rarity}]`);
+      if (res.totalScore === maxPips) {
+        let rCss = getRarityColor(res.gear.rarity);
+        optimalGears.add(`<span style="${rCss} font-weight: bold;">${res.gear.name}</span>`);
       }
     });
 
-    // Only display the box if at least one 14/14 combination was found
     if (optimalGears.size > 0) {
       html += `
         <div style="background: #2a2a2a; border: 1px dashed var(--accent); padding: 15px; border-radius: 4px; margin-bottom: 20px;">
@@ -2454,38 +2649,72 @@
           <ul style="margin: 0; padding-left: 20px; color: var(--text-main); font-weight: bold;">
       `;
       optimalGears.forEach(gearName => {
-        html += `<li>${gearName} - 14/14</li>`;
+        html += `<li>${gearName} - ${maxPips}/${maxPips}</li>`;
       });
-      html += `
-          </ul>
-        </div>
-      `;
+      html += `</ul></div>`;
     }
 
+    // 8. Print Result Cards
     results.forEach(res => {
-      let boostsStr = res.gear.displayBoosts.join(' / ');
+      let boostsStr = res.gear.displayBoosts ? res.gear.displayBoosts.join(' / ') : '';
       
       if (res.includeMentor) {
         boostsStr += ` <span style="color:#60a5fa;">[Mentor: +${res.mAmount1} ${res.mS1} / +${res.mAmount2} ${res.mS2}]</span>`;
       }
 
+      // 🚨 Move the Smart Color Engine to the top of the loop!
+      let tStyle = getTierColor(res.card.tier);
+      let tierTextCss = tStyle.isGradient 
+        ? `background: ${tStyle.fill}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; font-weight: bold;`
+        : `color: ${tStyle.fill}; font-weight: bold;`;
+        
+      // 🚨 Create the dynamic CSS for targeted stats
+      let activeStatCss = tStyle.isGradient 
+        ? `background: ${tStyle.fill}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;`
+        : `color: ${tStyle.fill}; font-weight: bold;`;
+
+      let leftColHtml = '';
+      let rightColHtml = '';
+
+      STAT_KEYS.forEach((statKey, index) => {
+         let cardVal = res.card.stats[statKey] || 0;
+         
+         let mentorBoost = 0;
+         if (res.includeMentor) {
+            if (res.mS1 === statKey) mentorBoost += res.mAmount1;
+            if (res.mS2 === statKey) mentorBoost += res.mAmount2;
+         }
+         
+         let gearVal = (res.gear.boosts[statKey] || 0) + mentorBoost;
+         
+         // 🚨 Check if this is one of our two target stats
+         let isTarget = (statKey === s1 || statKey === s2);
+         
+         const rowHtml = `
+            <div class="stat-row">
+              <span style="${isTarget ? activeStatCss : ''}">${statKey}</span>
+              ${drawPips(cardVal, gearVal)}
+            </div>
+         `;
+
+         if (index < 5) leftColHtml += rowHtml;
+         else rightColHtml += rowHtml;
+      });
+
       html += `
-        <div class="mentor-result">
-          <div class="mentor-score">Score: ${res.totalScore} / 14</div>
-          <p><strong>Card:</strong> ${res.card.player} | ${res.card.position} | ${res.card.tier} | ${res.card.theme} | ${res.card.team}</p>
-          <p><strong>Gear:</strong> ${res.gear.name} (${res.gear.rarity}) ${res.gear.team !== "None" ? `<span style="color:#ef4444; font-size:12px;">[${res.gear.team} Exclusive]</span>` : ''}</p>
+        <div class="mentor-result" style="position: relative; overflow: hidden; box-shadow: 0 4px 15px ${tStyle.shadowColor}15; --pip-color: ${tStyle.fill}; padding: 20px 20px 20px 26px; border: 1px solid var(--border); border-radius: 8px;">
+          <div style="position: absolute; top: 0; bottom: 0; left: 0; width: 6px; background: ${tStyle.fill};"></div>
+          
+          <div class="mentor-score" style="position: absolute; top: 15px; right: 15px; background: var(--bg-dark); padding: 4px 10px; border-radius: 6px; font-weight: bold; border: 1px solid var(--border); font-size: 14px;">Score: ${res.totalScore} / ${maxPips}</div>
+
+          <p style="margin-top: 0;"><strong>Card:</strong> ${res.card.player} | ${res.card.position} | <span style="${tierTextCss}">${res.card.tier}</span> | ${res.card.theme} | ${res.card.team}</p>
+          <p><strong>Gear:</strong> <span style="${getRarityColor(res.gear.rarity)} font-weight: bold;">${res.gear.name}</span> ${res.gear.team !== "None" ? `<span style="color:#ef4444; font-size:12px;">[${res.gear.team} Exclusive]</span>` : ''}</p>
           <p style="color:var(--accent); font-size:12px; margin-top:-10px; line-height: 1.4;"><em>Boosts: ${boostsStr}</em></p>
           <hr style="border:0; border-top:1px solid var(--border); margin: 10px 0;">
           
-          <div class="stats-columns" style="display: flex; flex-direction: column; gap: 6px; max-width: 400px;">
-            <div class="stat-row">
-              <span>${s1}</span>
-              ${drawPips(res.cardS1, res.gearS1)}
-            </div>
-            <div class="stat-row">
-              <span>${s2}</span>
-              ${drawPips(res.cardS2, res.gearS2)}
-            </div>
+          <div class="stats-columns">
+            <div class="stats-col">${leftColHtml}</div>
+            <div class="stats-col">${rightColHtml}</div>
           </div>
         </div>
       `;
@@ -2505,7 +2734,10 @@
     
     const container = document.getElementById('build-results');
 
-    // Track requested profile (each dropdown asks for 2 pips, total of 10 targeted pips)
+    // Read Fandom Toggles
+    const useFandom = document.getElementById('build-fandom-toggle').checked;
+    const useFavorite = document.getElementById('build-favorite-toggle').checked;
+
     let reqProfile = {};
     targetStats.forEach(s => reqProfile[s] = (reqProfile[s] || 0) + 2);
 
@@ -2539,6 +2771,25 @@
       if (themeF !== 'All' && card.theme !== themeF) return;
       if (teamF !== 'All' && card.team !== teamF) return;
 
+      // 🚨 NEW: Smart Fandom Array Parsing
+      let fBoosts = {}; 
+      let activeFandoms = []; 
+
+      if (TEAM_FANDOMS[card.team]) {
+        if (useFandom && TEAM_FANDOMS[card.team].main) {
+          TEAM_FANDOMS[card.team].main.forEach(b => {
+            fBoosts[b.stat] = (fBoosts[b.stat] || 0) + b.amount;
+            activeFandoms.push(`+${b.amount} ${b.stat}`);
+          });
+        }
+        if (useFavorite && TEAM_FANDOMS[card.team].favorite) {
+          TEAM_FANDOMS[card.team].favorite.forEach(b => {
+            fBoosts[b.stat] = (fBoosts[b.stat] || 0) + b.amount;
+            activeFandoms.push(`+${b.amount} ${b.stat}`);
+          });
+        }
+      }
+
       GEAR.forEach(baseGear => {
         if (rarF !== 'All' && baseGear.rarity !== rarF) return;
         if (!baseGear.positions.includes("None") && !baseGear.positions.includes(card.position)) return;
@@ -2548,7 +2799,6 @@
         let gearVariations = getGearVariations(baseGear);
 
         gearVariations.forEach(gear => {
-          
           let bestCombo = null;
 
           mentorPairs.forEach(pair => {
@@ -2556,47 +2806,44 @@
             let m2 = pair[1];
 
             let totalWasted = 0;
-            let baseStatsSum = 0;
             let profileMatch = 0;
             let overcapWarning = false;
 
-            // Calculate Wasted Pips and Overcap Warning
             uniqueTargets.forEach(stat => {
               let cStat = card.stats[stat] || 0;
               let gStat = gear.boosts[stat] || 0;
               let mBoost = (stat === m1 || stat === m2) ? 2 : 0;
+              let fBoost = fBoosts[stat] || 0; // Fetch smart fandom math
               
-              let combined = cStat + gStat + mBoost;
-              
+              let combined = cStat + gStat + mBoost + fBoost;
               totalWasted += Math.max(0, combined - 7);
-              baseStatsSum += cStat;
 
-              if (cStat >= 6 && (gStat > 0 || mBoost > 0)) {
+              // 🚨 NEW: Triggers the warning if the build exceeds 7 pips in ANY way
+              if (combined > 7) {
                 overcapWarning = true;
               }
             });
 
-            // Calculate exactly how many of the 10 targeted pips this combo provides
             for (let stat in reqProfile) {
               let gStat = gear.boosts[stat] || 0;
               let mBoost = (stat === m1 || stat === m2) ? 2 : 0;
-              profileMatch += Math.min(reqProfile[stat], gStat + mBoost);
+              let fBoost = fBoosts[stat] || 0; // Fetch smart fandom math
+
+              profileMatch += Math.min(reqProfile[stat], gStat + mBoost + fBoost);
             }
 
-            // The new "Score" is purely how well it matches the user's specific targets
             if (!bestCombo || 
                (profileMatch > bestCombo.profileMatch) ||
                (profileMatch === bestCombo.profileMatch && totalWasted < bestCombo.totalWasted)) {
-              
-              bestCombo = { m1, m2, totalWasted, baseStatsSum, profileMatch, overcapWarning };
+              bestCombo = { m1, m2, totalWasted, profileMatch, overcapWarning };
             }
           });
 
           results.push({
             card, gear,
             m1: bestCombo.m1, m2: bestCombo.m2,
+            fBoosts, activeFandoms, // Safely pass the smart fandom data down to the UI renderer
             totalWasted: bestCombo.totalWasted,
-            baseStatsSum: bestCombo.baseStatsSum,
             profileMatch: bestCombo.profileMatch,
             overcapWarning: bestCombo.overcapWarning
           });
@@ -2609,49 +2856,77 @@
       return;
     }
 
-    const rarityRank = { "Common": 1, "Uncommon": 2, "Rare": 3, "Epic": 4, "Legendary": 5 };
-    const getRarityWeight = (r) => rarityRank[r] || 99;
-
     results.sort((a, b) => {
-      // 1. Profile Match: How perfectly does this fit the 5 requested stats? (Max is 10)
       if (b.profileMatch !== a.profileMatch) return b.profileMatch - a.profileMatch; 
-      // 2. Efficiency: Least amount of over-capped stats wasted
       if (a.totalWasted !== b.totalWasted) return a.totalWasted - b.totalWasted;
-      // 3. Rarity: Lower rarity gear is prioritized
-      const rarityA = getRarityWeight(a.gear.rarity);
-      const rarityB = getRarityWeight(b.gear.rarity);
-      if (rarityA !== rarityB) return rarityA - rarityB; 
-      // 4. Tie-breaker: Highest base card stats
-      return b.baseStatsSum - a.baseStatsSum;
+      return 0; 
     });
 
     let html = `<h3>Optimal 5-Stat Builds</h3>`;
-    html += `<p style="color:var(--text-muted)">Ranked purely by how efficiently they provide your selected stats.</p>`;
+    html += `<p style="color:var(--text-muted)">Showing the most efficient gear and mentor combinations for your target stats.</p>`;
 
-    let optimalGears = new Set();
-    
-    results.forEach(res => {
-      // 🚨 MOST OPTIMAL GEAR: Only highlights builds that provide ALL 5 requested stats perfectly with ZERO wasted pips!
-      if (res.profileMatch === 10 && res.totalWasted === 0) {
-        optimalGears.add(`${res.gear.name} [${res.gear.rarity}]`);
-      }
-    });
-
-    if (optimalGears.size > 0) {
-      html += `
-        <div style="background: #2a2a2a; border: 1px dashed var(--accent); padding: 15px; border-radius: 4px; margin-bottom: 20px;">
-          <h4 style="margin: 0 0 10px 0; color: var(--accent);">Most Optimal Gear:</h4>
-          <ul style="margin: 0; padding-left: 20px; color: var(--text-main); font-weight: bold;">
-      `;
-      optimalGears.forEach(gearName => {
-        html += `<li>${gearName}</li>`;
+    if (results.length > 0) {
+      let bestProfileMatch = 0;
+      results.forEach(res => {
+        if (res.profileMatch > bestProfileMatch) {
+          bestProfileMatch = res.profileMatch;
+        }
       });
-      html += `</ul></div>`;
+
+      if (bestProfileMatch >= 9) {
+        let minWasted = Infinity;
+        results.forEach(res => {
+          if (res.profileMatch === bestProfileMatch && res.totalWasted < minWasted) {
+            minWasted = res.totalWasted;
+          }
+        });
+
+        let optimalGears = new Set();
+        results.forEach(res => {
+          if (res.profileMatch === bestProfileMatch && res.totalWasted === minWasted) {
+            let rCss = getRarityColor(res.gear.rarity);
+            optimalGears.add(`<span style="${rCss} font-weight: bold;">${res.gear.name}</span>`);
+          }
+        });
+
+        if (optimalGears.size > 0) {
+          let impossibleWarning = bestProfileMatch === 9 
+            ? `<div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 8px; margin-top: 12px; font-size: 13px; color: #fca5a5;">
+                <strong>⚠️ Impossible Build:</strong> No gear/mentor/fandom combination exists to grant a perfect +10 for these exact 5 stats. Showing the best +9 alternatives.
+               </div>` 
+            : '';
+
+          html += `
+            <div style="background: #2a2a2a; border: 1px dashed var(--accent); padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+              <h4 style="margin: 0 0 10px 0; color: var(--accent);">Most Optimal Gear:</h4>
+              <ul style="margin: 0; padding-left: 20px; color: var(--text-main); font-weight: bold;">
+          `;
+          optimalGears.forEach(gearName => {
+            html += `<li>${gearName}</li>`;
+          });
+          html += `</ul>${impossibleWarning}</div>`;
+        }
+      }
     }
 
     results.forEach(res => {
       let boostsStr = res.gear.displayBoosts.join(' / ');
       let mentorStr = `<span style="color:#60a5fa;">[Auto-Mentor: +2 ${res.m1}${res.m2 ? ` / +2 ${res.m2}` : ''}]</span>`;
+      
+      // Build the dynamic Fandom text display safely!
+      let fandomStr = "";
+      if (res.activeFandoms && res.activeFandoms.length > 0) {
+        fandomStr = `<br><span style="color:#10b981;">[Fandom: ${res.activeFandoms.join(' / ')}]</span>`;
+      }
+
+      let tStyle = getTierColor(res.card.tier);
+      let tierTextCss = tStyle.isGradient 
+        ? `background: ${tStyle.fill}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; font-weight: bold;`
+        : `color: ${tStyle.fill}; font-weight: bold;`;
+        
+      let activeStatCss = tStyle.isGradient 
+        ? `background: ${tStyle.fill}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;`
+        : `color: ${tStyle.fill}; font-weight: bold;`;
 
       let leftColHtml = '';
       let rightColHtml = '';
@@ -2659,12 +2934,15 @@
       STAT_KEYS.forEach((statKey, index) => {
          let cardVal = res.card.stats[statKey] || 0;
          let mentorBoost = (statKey === res.m1 || statKey === res.m2) ? 2 : 0;
-         let gearVal = (res.gear.boosts[statKey] || 0) + mentorBoost;
+         let gBoost = res.gear.boosts[statKey] || 0;
+         let fBoost = res.fBoosts[statKey] || 0;
+
+         let totalExtraPips = gBoost + mentorBoost + fBoost;
          
          const rowHtml = `
             <div class="stat-row">
-              <span style="${targetStats.includes(statKey) ? 'color: var(--accent); font-weight: bold;' : ''}">${statKey}</span>
-              ${drawPips(cardVal, gearVal)}
+              <span style="${targetStats.includes(statKey) ? activeStatCss : ''}">${statKey}</span>
+              ${drawPips(cardVal, totalExtraPips)}
             </div>
          `;
 
@@ -2674,15 +2952,17 @@
 
       let warningHtml = res.overcapWarning 
         ? `<div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 8px; margin-top: 10px; font-size: 13px; color: #fca5a5;">
-            <strong>⚠️ Inefficient Stat Selection:</strong> You are targeting a stat that natively has 6+ pips on this card. Using gear/mentors on this stat causes wasted pips.
+            <strong>⚠️ Inefficient Stat Selection:</strong> This build boosts a targeted stat past the 7-pip maximum, resulting in wasted pips.
            </div>` 
         : '';
 
       html += `
-        <div class="mentor-result">
-          <p><strong>Card:</strong> ${res.card.player} | ${res.card.position} | ${res.card.tier} | ${res.card.theme} | ${res.card.team}</p>
-          <p><strong>Gear:</strong> ${res.gear.name} (${res.gear.rarity}) ${res.gear.team !== "None" ? `<span style="color:#ef4444; font-size:12px;">[${res.gear.team} Exclusive]</span>` : ''}</p>
-          <p style="color:var(--accent); font-size:12px; margin-top:-10px; line-height: 1.4;"><em>Gear Boosts: ${boostsStr} <br> ${mentorStr}</em></p>
+        <div class="mentor-result" style="position: relative; overflow: hidden; box-shadow: 0 4px 15px ${tStyle.shadowColor}15; --pip-color: ${tStyle.fill}; padding: 20px 20px 20px 26px; border: 1px solid var(--border); border-radius: 8px;">
+          <div style="position: absolute; top: 0; bottom: 0; left: 0; width: 6px; background: ${tStyle.fill};"></div>
+          
+          <p style="margin-top: 0;"><strong>Card:</strong> ${res.card.player} | ${res.card.position} | <span style="${tierTextCss}">${res.card.tier}</span> | ${res.card.theme} | ${res.card.team}</p>
+          <p><strong>Gear:</strong> <span style="${getRarityColor(res.gear.rarity)} font-weight: bold;">${res.gear.name}</span> ${res.gear.team !== "None" ? `<span style="color:#ef4444; font-size:12px;">[${res.gear.team} Exclusive]</span>` : ''}</p>
+          <p style="color:var(--accent); font-size:12px; margin-top:-10px; line-height: 1.4;"><em>Gear Boosts: ${boostsStr} <br> ${mentorStr} ${fandomStr}</em></p>
           <hr style="border:0; border-top:1px solid var(--border); margin: 10px 0;">
           
           <div class="stats-columns">

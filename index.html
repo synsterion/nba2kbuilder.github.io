@@ -2814,13 +2814,17 @@
               let cStat = card.stats[stat] || 0;
               let gStat = gear.boosts[stat] || 0;
               let mBoost = (stat === m1 || stat === m2) ? 2 : 0;
-              let fBoost = fBoosts[stat] || 0; // Fetch smart fandom math
+              let fBoost = fBoosts[stat] || 0; 
               
               let combined = cStat + gStat + mBoost + fBoost;
+              
+              // This still calculates total wasted pips for sorting the "Most Optimal" ranking
               totalWasted += Math.max(0, combined - 7);
 
-              // 🚨 NEW: Triggers the warning if the build exceeds 7 pips in ANY way
-              if (combined > 7) {
+              // 🚨 NEW: Only trigger the warning if the base card + gear + mentor exceeds 7.
+              // If Fandom is the ONLY thing pushing it over 7, the warning is ignored!
+              let combinedWithoutFandom = cStat + gStat + mBoost;
+              if (combinedWithoutFandom > 7) {
                 overcapWarning = true;
               }
             });

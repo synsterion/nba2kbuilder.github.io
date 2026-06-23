@@ -2274,6 +2274,27 @@
     return { fill, isGradient, shadowColor };
   };
 
+  const getFoilBonusStat = (card) => {
+    // 1. If it's not a Foil card, exit immediately
+    if (!card.theme.includes("[Foil]")) return null;
+    
+    // 2. Find the exact name of the non-Foil theme
+    let baseTheme = card.theme.replace(" [Foil]", "");
+    
+    // 3. Look up the base card in the database
+    let baseCard = CARDS.find(c => c.player === card.player && c.theme === baseTheme);
+    if (!baseCard) return null; // Safe fallback if the base card isn't in the database yet
+
+    // 4. Compare stats to find the +1 pip
+    for (let stat of STAT_KEYS) {
+      let foilVal = card.stats[stat] || 0;
+      let baseVal = baseCard.stats[stat] || 0;
+      if (foilVal > baseVal) return stat; // We found the extra pip!
+    }
+    
+    return null;
+  };
+
   const getRarityColor = (rarity) => {
     const colors = {
       "Common": "linear-gradient(135deg, #94a3b8, #808080)",      
@@ -2362,13 +2383,20 @@
     renderCards();
   }
 
-  function drawPips(baseValue, boostValue = 0) {
+  function drawPips(cardVal, extraVal, isFoilPip = false) {
     let html = '<div class="pips">';
-    for(let i = 1; i <= 7; i++) {
-      if (i <= baseValue) {
-        html += `<div class="pip filled"></div>`;
-      } else if (i <= baseValue + boostValue) {
-        html += `<div class="pip boosted" title="Gear Boost"></div>`;
+    let total = cardVal + extraVal;
+    
+    for (let i = 1; i <= 7; i++) {
+      if (i <= cardVal) {
+        // 🚨 NEW: If this is the Foil stat, color the final base pip with a Holographic gradient!
+        if (isFoilPip && i === cardVal) {
+          html += `<div class="pip filled" style="background: linear-gradient(135deg, #ff00aa, #00d4ff); box-shadow: 0 0 6px rgba(0, 212, 255, 0.8);"></div>`;
+        } else {
+          html += `<div class="pip filled"></div>`;
+        }
+      } else if (i <= total) {
+        html += `<div class="pip boosted"></div>`;
       } else {
         html += `<div class="pip"></div>`;
       }
@@ -2425,19 +2453,28 @@
     let finalHtml = '';
 
     cardsToDisplay.forEach(card => {
+      // 🚨 NEW: Find out if this card has a foil stat
+      let foilStatKey = getFoilBonusStat(card);
+
       let leftColHtml = '';
       let rightColHtml = '';
 
-      STAT_KEYS.forEach((key, index) => {
-        const val = card.stats[key] || 0;
-        const rowHtml = `
-          <div class="stat-row">
-            <span>${key}</span>
-            ${drawPips(val)}
-          </div>`;
-        
-        if (index < 5) leftColHtml += rowHtml;
-        else rightColHtml += rowHtml;
+      STAT_KEYS.forEach((statKey, index) => {
+         let cardVal = card.stats[statKey] || 0;
+         
+         // 🚨 NEW: Check if the current stat in the loop is the foil stat
+         let isFoilPip = (statKey === foilStatKey);
+         
+         const rowHtml = `
+            <div class="stat-row">
+              <span>${statKey}</span>
+              <!-- Pass the isFoilPip flag into the draw function! (0 extra pips in catalog) -->
+              ${drawPips(cardVal, 0, isFoilPip)}
+            </div>
+         `;
+
+         if (index < 5) leftColHtml += rowHtml;
+         else rightColHtml += rowHtml;
       });
 
     let tStyle = getTierColor(card.tier);
@@ -2681,6 +2718,9 @@
         ? `background: ${tStyle.fill}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;`
         : `color: ${tStyle.fill}; font-weight: bold;`;
 
+      // 🚨 NEW: Find out if this card has a foil stat
+      let foilStatKey = getFoilBonusStat(res.card);
+
       let leftColHtml = '';
       let rightColHtml = '';
 
@@ -2695,13 +2735,14 @@
          
          let gearVal = (res.gear.boosts[statKey] || 0) + mentorBoost;
          
-         // 🚨 Check if this is one of our two target stats
+         // 🚨 NEW: Check if the current stat in the loop is the foil stat
+         let isFoilPip = (statKey === foilStatKey);
          let isTarget = (statKey === s1 || statKey === s2);
          
          const rowHtml = `
             <div class="stat-row">
               <span style="${isTarget ? activeStatCss : ''}">${statKey}</span>
-              ${drawPips(cardVal, gearVal)}
+              ${drawPips(cardVal, gearVal, isFoilPip)}
             </div>
          `;
 
@@ -2940,6 +2981,9 @@
         ? `background: ${tStyle.fill}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;`
         : `color: ${tStyle.fill}; font-weight: bold;`;
 
+      // 🚨 NEW: Find out if this card has a foil stat
+      let foilStatKey = getFoilBonusStat(res.card);
+
       let leftColHtml = '';
       let rightColHtml = '';
 
@@ -2951,10 +2995,13 @@
 
          let totalExtraPips = gBoost + mentorBoost + fBoost;
          
+         // 🚨 NEW: Check if the current stat in the loop is the foil stat
+         let isFoilPip = (statKey === foilStatKey);
+         
          const rowHtml = `
             <div class="stat-row">
               <span style="${targetStats.includes(statKey) ? activeStatCss : ''}">${statKey}</span>
-              ${drawPips(cardVal, totalExtraPips)}
+              ${drawPips(cardVal, totalExtraPips, isFoilPip)} 
             </div>
          `;
 

@@ -185,10 +185,11 @@
       </header>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('catalog')">Card Catalog</button>
-    <button class="tab-btn" onclick="switchTab('mentor')">Mentor Maker</button>
-    <button class="tab-btn" onclick="switchTab('build')">Build Maker</button>
-  </div>
+        <button class="tab-btn active" onclick="switchTab('catalog')">Card Catalog</button>
+        <button class="tab-btn" onclick="switchTab('gear')">Gear Catalog</button>
+        <button class="tab-btn" onclick="switchTab('mentor')">Mentor Maker</button>
+        <button class="tab-btn" onclick="switchTab('build')">Build Maker</button>
+      </div>
 
   <!-- VIEW: CARD CATALOG -->
   <div id="catalog" class="view active">
@@ -211,6 +212,92 @@
     </div>
     <div class="grid" id="cards-container"></div>
   </div>
+
+  <!-- VIEW: GEAR CATALOG -->
+      <div id="gear" class="view">
+        <div class="controls">
+          <input type="text" id="gear-search-name" placeholder="Search Gear Name..." oninput="renderGears()">
+          
+          <select id="gear-filter-rarity" onchange="renderGears()">
+            <option value="All">All Rarities</option>
+            <option value="Common">Common</option>
+            <option value="Uncommon">Uncommon</option>
+            <option value="Rare">Rare</option>
+            <option value="Epic">Epic</option>
+            <option value="Legendary">Legendary</option>
+          </select>
+
+          <select id="gear-filter-team" onchange="renderGears()">
+            <option value="All">All Teams</option>
+            <option value="Cavaliers">Cavaliers</option>
+          </select>
+          
+          <select id="gear-filter-position" onchange="renderGears()">
+            <option value="All">All Positions</option>
+            <option value="PG">PG</option>
+            <option value="SG">SG</option>
+            <option value="SF">SF</option>
+            <option value="PF">PF</option>
+            <option value="C">C</option>
+          </select>
+
+          <!-- NEW: Sorting Controls -->
+          <select id="gear-sort" onchange="renderGears()">
+            <option value="Rarity">Sort By: Rarity</option>
+            <option value="Name">Sort By: Name</option>
+          </select>
+          
+          <button class="action-btn" id="gear-sort-reverse-btn" onclick="toggleGearSortOrder()">↕️ Reverse: OFF</button>
+        </div>
+
+        <!-- NEW: 3 Stat Filters -->
+        <div class="controls" style="background: #2a2a2a; border: 1px dashed var(--accent);">
+          <div style="width: 100%; font-weight: bold; margin-bottom: 5px; color: var(--accent);">Filter by Stats:</div>
+          <select id="gear-filter-stat-1" onchange="renderGears()">
+            <option value="All">Any Stat 1</option>
+            <option value="Shoot off Dribble">Shoot off Dribble</option>
+            <option value="Layups & Dunks">Layups & Dunks</option>
+            <option value="Mid-range Shooting">Mid-range Shooting</option>
+            <option value="3PT Shot">3PT Shot</option>
+            <option value="Post Scoring">Post Scoring</option>
+            <option value="Agility">Agility</option>
+            <option value="Strength">Strength</option>
+            <option value="Rebounding">Rebounding</option>
+            <option value="Playmaking">Playmaking</option>
+            <option value="Defending">Defending</option>
+          </select>
+          
+          <select id="gear-filter-stat-2" onchange="renderGears()">
+            <option value="All">Any Stat 2</option>
+            <option value="Shoot off Dribble">Shoot off Dribble</option>
+            <option value="Layups & Dunks">Layups & Dunks</option>
+            <option value="Mid-range Shooting">Mid-range Shooting</option>
+            <option value="3PT Shot">3PT Shot</option>
+            <option value="Post Scoring">Post Scoring</option>
+            <option value="Agility">Agility</option>
+            <option value="Strength">Strength</option>
+            <option value="Rebounding">Rebounding</option>
+            <option value="Playmaking">Playmaking</option>
+            <option value="Defending">Defending</option>
+          </select>
+          
+          <select id="gear-filter-stat-3" onchange="renderGears()">
+            <option value="All">Any Stat 3</option>
+            <option value="Shoot off Dribble">Shoot off Dribble</option>
+            <option value="Layups & Dunks">Layups & Dunks</option>
+            <option value="Mid-range Shooting">Mid-range Shooting</option>
+            <option value="3PT Shot">3PT Shot</option>
+            <option value="Post Scoring">Post Scoring</option>
+            <option value="Agility">Agility</option>
+            <option value="Strength">Strength</option>
+            <option value="Rebounding">Rebounding</option>
+            <option value="Playmaking">Playmaking</option>
+            <option value="Defending">Defending</option>
+          </select>
+        </div>
+        
+        <div class="grid" id="gears-container"></div>
+      </div>
 
   <!-- VIEW: MENTOR MAKER -->
   <div id="mentor" class="view">
@@ -326,6 +413,8 @@
   ];
 
   let isReversed = false;
+
+  let isGearReversed = false;
 
   const CARDS = [
     { player: "Derrick Jones Jr.", position: "SF", theme: "Foundation", tier: "Titanium Quartz", team: "Clippers", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 5, "Mid-range Shooting": 3, "3PT Shot": 4, "Post Scoring": 2, "Agility": 5, "Strength": 4, "Rebounding": 4, "Playmaking": 3, "Defending": 4 } },
@@ -1868,18 +1957,18 @@
     { player: "Anthony Davis", position: "PF", theme: "S7 Summer", tier: "Inferno Opal", team: "Mavericks", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 5, "Agility": 5, "Strength": 4, "Rebounding": 5, "Playmaking": 3, "Defending": 5 } },
     { player: "Jimmy Butler", position: "SF", theme: "S7 Summer", tier: "Inferno Opal", team: "Warriors", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 5, "Agility": 4, "Strength": 4, "Rebounding": 3, "Playmaking": 4, "Defending": 5 } },
     { player: "Malik Monk", position: "PG", theme: "S7 Summer", tier: "Inferno Opal", team: "Kings", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 4, "3PT Shot": 5, "Post Scoring": 2, "Agility": 5, "Strength": 2, "Rebounding": 2, "Playmaking": 4, "Defending": 3 } },
-    { player: "Alperen Sengun", position: "C", theme: "Rising Stars", tier: "Inferno Opal", team: "Rockets", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 4, "3PT Shot": 3, "Post Scoring": 5, "Agility": 3, "Strength": 5, "Rebounding": 5, "Playmaking": 4, "Defending": 4 } },
+    { player: "Alperen Sengun", position: "C", theme: "Rising Stars", tier: "Inferno Opal", team: "R  ockets", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 4, "3PT Shot": 3, "Post Scoring": 5, "Agility": 3, "Strength": 5, "Rebounding": 5, "Playmaking": 4, "Defending": 4 } },
     { player: "Dereck Lively II", position: "C", theme: "Rising Stars", tier: "Inferno Opal", team: "Mavericks", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 2, "Post Scoring": 3, "Agility": 4, "Strength": 4, "Rebounding": 5, "Playmaking": 3, "Defending": 4 } },
     { player: "Scottie Barnes", position: "PF", theme: "Rising Stars", tier: "Inferno Opal", team: "Raptors", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 4, "Post Scoring": 4, "Agility": 5, "Strength": 4, "Rebounding": 4, "Playmaking": 4, "Defending": 5 } },
     { player: "Tyler Herro", position: "SG", theme: "Rising Stars", tier: "Inferno Opal", team: "Heat", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 3, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 2, "Agility": 4, "Strength": 4, "Rebounding": 3, "Playmaking": 4, "Defending": 3 } },
     { player: "LeBron James", position: "PF", theme: "King James [Elite]", tier: "Inferno Opal", team: "Lakers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 5, "Post Scoring": 5, "Agility": 5, "Strength": 5, "Rebounding": 4, "Playmaking": 5, "Defending": 5 } },
     { player: "LeBron James", position: "PF", theme: "King James", tier: "Inferno Opal", team: "Lakers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 5, "Post Scoring": 5, "Agility": 5, "Strength": 5, "Rebounding": 4, "Playmaking": 5, "Defending": 5 } },
-    { player: "Magic Johnson", position: "C", theme: "S7 Goat", tier: "Inferno Opal", team: "Lakers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 5, "Agility": 5, "Strength": 5, "Rebounding": 4, "Playmaking": 6, "Defending": 5 } },
-    { player: "Tim Duncan", position: "PF", theme: "S7 Goat", tier: "Inferno Opal", team: "Spurs", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 6, "3PT Shot": 2, "Post Scoring": 6, "Agility": 3, "Strength": 5, "Rebounding": 5, "Playmaking": 3, "Defending": 5 } },
-    { player: "Dwyane Wade", position: "PG", theme: "S7 Goat", tier: "Inferno Opal", team: "Heat", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 5, "Strength": 4, "Rebounding": 3, "Playmaking": 5, "Defending": 5 } },
-    { player: "Shaquille O'Neal", position: "C", theme: "S7 Goat", tier: "Inferno Opal", team: "Heat", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 1, "3PT Shot": 1, "Post Scoring": 5, "Agility": 4, "Strength": 5, "Rebounding": 5, "Playmaking": 3, "Defending": 5 } },
-    { player: "Allen Iverson", position: "SG", theme: "S7 Goat", tier: "Inferno Opal", team: "Sixers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 2, "Agility": 5, "Strength": 4, "Rebounding": 2, "Playmaking": 5, "Defending": 5 } },
-    { player: "Kevin Durant", position: "SF", theme: "S7 Goat", tier: "Inferno Opal", team: "Thunder", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 4, "Strength": 3, "Rebounding": 5, "Playmaking": 4, "Defending": 4 } },
+    { player: "Magic Johnson", position: "C", theme: "S7 GOAT", tier: "Inferno Opal", team: "Lakers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 5, "Agility": 5, "Strength": 5, "Rebounding": 4, "Playmaking": 6, "Defending": 5 } },
+    { player: "Tim Duncan", position: "PF", theme: "S7 GOAT", tier: "Inferno Opal", team: "Spurs", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 6, "3PT Shot": 2, "Post Scoring": 6, "Agility": 3, "Strength": 5, "Rebounding": 5, "Playmaking": 3, "Defending": 5 } },
+    { player: "Dwyane Wade", position: "PG", theme: "S7 GOAT", tier: "Inferno Opal", team: "Heat", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 5, "Strength": 4, "Rebounding": 3, "Playmaking": 5, "Defending": 5 } },
+    { player: "Shaquille O'Neal", position: "C", theme: "S7 GOAT", tier: "Inferno Opal", team: "Heat", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 1, "3PT Shot": 1, "Post Scoring": 5, "Agility": 4, "Strength": 5, "Rebounding": 5, "Playmaking": 3, "Defending": 5 } },
+    { player: "Allen Iverson", position: "SG", theme: "S7 GOAT", tier: "Inferno Opal", team: "Sixers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 2, "Agility": 5, "Strength": 4, "Rebounding": 2, "Playmaking": 5, "Defending": 5 } },
+    { player: "Kevin Durant", position: "SF", theme: "S7 GOAT", tier: "Inferno Opal", team: "Thunder", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 4, "Strength": 3, "Rebounding": 5, "Playmaking": 4, "Defending": 4 } },
     { player: "Victor Wembanyama", position: "C", theme: "S7 Showstoppers", tier: "Inferno Opal", team: "Spurs", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 4, "3PT Shot": 4, "Post Scoring": 5, "Agility": 4, "Strength": 3, "Rebounding": 5, "Playmaking": 3, "Defending": 5 } },
     { player: "Donovan Mitchell", position: "PG", theme: "S7 Showstoppers", tier: "Inferno Opal", team: "Cavaliers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 1, "Agility": 5, "Strength": 3, "Rebounding": 2, "Playmaking": 5, "Defending": 4 } },
     { player: "Kristaps Porzingis", position: "PF", theme: "S7 Showstoppers", tier: "Inferno Opal", team: "Celtics", stats: { "Shoot off Dribble": 4, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 5, "Agility": 4, "Strength": 4, "Rebounding": 4, "Playmaking": 2, "Defending": 5 } },
@@ -2004,6 +2093,14 @@
 { player: "Cameron Thomas", position: "SG", theme: "Heat Check", tier: "Crimson", team: "Bucks", stats: { "Shoot off Dribble": 6, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 4, "Agility": 5, "Strength": 3, "Rebounding": 2, "Playmaking": 3, "Defending": 3 } },
 { player: "Magic Johnson", position: "SF", theme: "Magic", tier: "Lunar Rose", team: "Lakers", stats: { "Shoot off Dribble": 6, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 5, "Agility": 5, "Strength": 5, "Rebounding": 5, "Playmaking": 6, "Defending": 5 } },
 { player: "Magic Johnson", position: "SF", theme: "Magic [Elite]", tier: "Lunar Rose", team: "Lakers", stats: { "Shoot off Dribble": 6, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 6, "Post Scoring": 5, "Agility": 5, "Strength": 6, "Rebounding": 5, "Playmaking": 6, "Defending": 5 } },
+{ player: "LaMelo Ball", position: "PG", theme: "S8 Courtside", tier: "Lunar Rose", team: "Timberwolves", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 6, "3PT Shot": 5, "Post Scoring": 3, "Agility": 6, "Strength": 3, "Rebounding": 4, "Playmaking": 6, "Defending": 4 } },
+{ player: "Kevin Durant", position: "PF", theme: "S7 Courtside", tier: "Titanium Quartz", team: "Suns", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 4, "Strength": 3, "Rebounding": 4, "Playmaking": 5, "Defending": 5 } },
+{ player: "Wilt Chamberlain", position: "C", theme: "S7 Courtside", tier: "Solar Diamond", team: "Sixers", stats: { "Shoot off Dribble": 2, "Layups & Dunks": 4, "Mid-range Shooting": 1, "3PT Shot": 1, "Post Scoring": 6, "Agility": 4, "Strength": 5, "Rebounding": 6, "Playmaking": 4, "Defending": 6 } },
+{ player: "Michael Jordan", position: "SG", theme: "S7 Courtside", tier: "Solar Diamond", team: "Bulls", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 4, "Agility": 5, "Strength": 3, "Rebounding": 3, "Playmaking": 5, "Defending": 5 } },
+{ player: "Kawhi Leonard", position: "SF", theme: "S7 Courtside", tier: "Meteorite", team: "Clippers", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 5, "Strength": 4, "Rebounding": 4, "Playmaking": 4, "Defending": 5 } },
+{ player: "Jalen Brunson", position: "PG", theme: "S7 Courtside", tier: "Meteorite", team: "Knicks", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 3, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 3, "Agility": 5, "Strength": 3, "Rebounding": 2, "Playmaking": 5, "Defending": 4 } },
+{ player: "Anthony Edwards", position: "SG", theme: "S7 Courtside", tier: "Moonstone", team: "Timberwolves", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 5, "Mid-range Shooting": 5, "3PT Shot": 5, "Post Scoring": 4, "Agility": 5, "Strength": 4, "Rebounding": 3, "Playmaking": 4, "Defending": 5 } },
+{ player: "Jimmy Butler", position: "PF", theme: "S7 Courtside", tier: "Moonstone", team: "Heat", stats: { "Shoot off Dribble": 5, "Layups & Dunks": 4, "Mid-range Shooting": 5, "3PT Shot": 4, "Post Scoring": 5, "Agility": 4, "Strength": 4, "Rebounding": 3, "Playmaking": 4, "Defending": 5 } },
 ];
 
   const GEAR = [
@@ -2353,6 +2450,12 @@
     event.currentTarget.classList.add('active');
   }
 
+  function toggleGearSortOrder() {
+    isGearReversed = !isGearReversed;
+    document.getElementById('gear-sort-reverse-btn').innerText = isGearReversed ? "↕️ Reverse: ON" : "↕️ Reverse: OFF";
+    renderGears();
+  }
+
   function toggleSortOrder() {
     isReversed = !isReversed;
     document.getElementById('sort-reverse-btn').innerText = isReversed ? "↕️ Reverse: ON" : "↕️ Reverse: OFF";
@@ -2409,6 +2512,7 @@
     });
 
     renderCards();
+    renderGears();
   }
 
   function drawPips(cardVal, extraVal, isFoilPip = false) {
@@ -2431,6 +2535,171 @@
     }
     html += '</div>';
     return html;
+  }
+
+  function renderGears() {
+    const container = document.getElementById('gears-container');
+    const searchQ = document.getElementById('gear-search-name').value.toLowerCase();
+    const rarF = document.getElementById('gear-filter-rarity').value;
+    const teamF = document.getElementById('gear-filter-team').value;
+    const posF = document.getElementById('gear-filter-position').value;
+    
+    const stat1F = document.getElementById('gear-filter-stat-1').value;
+    const stat2F = document.getElementById('gear-filter-stat-2').value;
+    const stat3F = document.getElementById('gear-filter-stat-3').value;
+
+    // 🚨 NEW: Fetch Sort and Reverse inputs
+    const sortF = document.getElementById('gear-sort').value;
+
+    let html = '';
+
+    if (typeof GEAR === 'undefined') {
+      container.innerHTML = '<p>Gear database not found.</p>';
+      return;
+    }
+
+    // 🚨 1. Filter out gears that don't match our criteria
+    let filteredGears = GEAR.filter(gear => {
+      if (searchQ !== '' && !gear.name.toLowerCase().includes(searchQ)) return false;
+      if (rarF !== 'All' && gear.rarity !== rarF) return false;
+      if (teamF !== 'All' && gear.team !== teamF) return false;
+      
+      let posMatch = false;
+      if (posF === 'All') {
+          posMatch = true;
+      } else {
+          if (gear.positions && gear.positions.includes(posF)) posMatch = true;
+          if (gear.positions && gear.positions.includes("None")) posMatch = true; 
+      }
+      if (!posMatch) return false;
+
+      let gearOptions = gear.options || [];
+      let possibleStats = new Set();
+      let hasWildcard = false;
+
+      gearOptions.forEach(opt => {
+        let statsList = opt.stats || [];
+        if (statsList.includes("STAT_KEYS") || statsList === "STAT_KEYS") {
+          hasWildcard = true;
+        } else if (Array.isArray(statsList)) {
+          statsList.forEach(s => possibleStats.add(s));
+        } else if (typeof statsList === 'string') {
+          possibleStats.add(statsList);
+        }
+      });
+
+      let targetStats = [stat1F, stat2F, stat3F].filter(s => s !== 'All');
+      let statMatch = true;
+      for (let tStat of targetStats) {
+        if (!hasWildcard && !possibleStats.has(tStat)) {
+          statMatch = false;
+          break;
+        }
+      }
+      
+      return statMatch;
+    });
+
+    // 🚨 2. Sort the filtered results
+    const GEAR_RARITY_ORDER = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+    
+    filteredGears.sort((a, b) => {
+      if (sortF === 'Rarity') {
+        // High rarity first (Legendary -> Common)
+        let aWeight = GEAR_RARITY_ORDER.indexOf(a.rarity);
+        let bWeight = GEAR_RARITY_ORDER.indexOf(b.rarity);
+        
+        if (aWeight !== bWeight) return bWeight - aWeight; 
+        // If they are the same rarity, sort them alphabetically
+        return a.name.localeCompare(b.name);
+      } else if (sortF === 'Name') {
+        // A to Z
+        return a.name.localeCompare(b.name);
+      }
+      return 0;
+    });
+
+    // 🚨 3. Apply Reverse logic if toggled ON
+ if (isGearReversed) {
+   filteredGears.reverse();
+ }
+
+    // 🚨 4. Build the HTML for the final sorted list
+    filteredGears.forEach(gear => {
+      let rCss = getRarityColor(gear.rarity);
+      let teamLabel = gear.team !== "None" 
+        ? `<span style="color:#ef4444; font-weight:bold;">${gear.team}</span>` 
+        : '<span style="color:var(--text-muted);">Any Team</span>';
+        
+      let posLabel = gear.positions && !gear.positions.includes("None") 
+        ? `<strong>${gear.positions.join(', ')}</strong>` 
+        : '<span style="color:var(--text-muted);">Any Position</span>';
+
+      let slotsHtml = '<div style="display: flex; gap: 8px; margin-top: 10px;">';
+      let gearOptions = gear.options || [];
+      
+      if (gearOptions.length > 0) {
+        gearOptions.forEach((option, index) => {
+          slotsHtml += `
+            <div style="flex: 1; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border); border-radius: 4px; padding: 8px; font-size: 12px; min-width: 0;">
+              <div style="text-align: center; font-weight: bold; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 6px;">
+                Slot ${index + 1}
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px; line-height: 1.3;">
+          `;
+
+          let amt = option.amount || 2;
+          let statsList = option.stats || [];
+
+          if (statsList.includes("STAT_KEYS") || statsList === "STAT_KEYS") {
+            STAT_KEYS.forEach(sKey => {
+              slotsHtml += `<div><span style="color:#10b981; font-weight:bold;">+${amt}</span> ${sKey}</div>`;
+            });
+          } else if (Array.isArray(statsList)) {
+            statsList.forEach(sKey => {
+              slotsHtml += `<div><span style="color:#10b981; font-weight:bold;">+${amt}</span> ${sKey}</div>`;
+            });
+          } else if (typeof statsList === 'string') {
+            slotsHtml += `<div><span style="color:#10b981; font-weight:bold;">+${amt}</span> ${statsList}</div>`;
+          }
+
+          slotsHtml += `</div></div>`;
+        });
+      } else {
+        slotsHtml += `<div style="color:var(--text-muted); font-size:13px; padding: 5px;">No slot configuration mapped for this item.</div>`;
+      }
+      
+      slotsHtml += '</div>';
+
+      html += `
+        <div class="card" style="border: 1px solid var(--border); padding: 15px; border-radius: 8px; background: var(--card-bg); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; ${rCss.includes('gradient') ? rCss.replace('-webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;', '') : 'background: ' + rCss.replace('color: ', '')}"></div>
+            
+            <div class="card-header" style="border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; margin-top: 5px;">
+              <h3 class="card-title" style="${rCss} margin: 0; font-size: 22px;">${gear.name}</h3>
+              <div class="card-subtitle" style="margin-top: 5px;">
+                <strong>Rarity:</strong> <span style="${rCss} font-weight:bold;">${gear.rarity}</span>
+              </div>
+            </div>
+            
+            <p style="margin: 4px 0; font-size: 13px;"><strong>Team:</strong> ${teamLabel}</p>
+            <p style="margin: 4px 0; font-size: 13px;"><strong>Position:</strong> ${posLabel}</p>
+          </div>
+          
+          <div style="margin-top: 12px;">
+            <div style="font-size: 12px; color: var(--accent); font-weight: bold; margin-bottom: 4px;">Available Attribute Pools:</div>
+            ${slotsHtml}
+          </div>
+        </div>
+      `;
+    });
+
+    if (html === '') {
+      html = '<p style="color: var(--text-muted);">No gears found matching your filters.</p>';
+    }
+
+    container.innerHTML = html;
   }
 
   function renderCards() {
